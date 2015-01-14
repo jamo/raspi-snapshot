@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+require 'cgi'
+require 'tmpdir'
+require 'fileutils'
+
+cgi = CGI.new
+real_id = cgi.path_info.gsub("/", "")
+
+mode = 'night' if cgi.has_key?("night")
+mode ||= 'auto'
+date = "#{Time.now.strftime("%Y%m%d%H%M%L")}_#{mode}.jpg"
+dir = File.join(Dir.tmpdir, "jamocam")
+FileUtils.mkdir_p(dir) unless Dir.exists? dir
+fork do
+  Dir.chdir(dir) do
+    `ssh -p 2222 pi@127.0.0.1  'raspistill -ex #{mode} -vf -hf -o #{date}'`
+    `scp -P 2222 pi@127.0.0.1:#{date} /tmp/jamocam/`
+  end
+end
+
+cgi.out(status: "302", location: "/#{date}") { 'success' }
