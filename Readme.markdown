@@ -33,6 +33,9 @@ This provides following api
 * /update/?night=1
 > Takes a snapshot in night expousure and refirect to /:snapshot
 
+* /update/?verylong=1
+> Takes a snapshot with verylong expousure and refirect to /:snapshot
+
 
 
 
